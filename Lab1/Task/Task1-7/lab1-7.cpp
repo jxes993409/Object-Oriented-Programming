@@ -47,16 +47,17 @@ void PointND::assignCoord(int *vec, int len)
 void PointND::displayPointND()
 {
   std::cout << "(";
-  for (int i=0;i<num;i++)
+  for (int i=0; i < num; i++)
   {
     std::cout << coord[i];
-    if (i!=num-1)
+    if (i != num - 1)
     {
       std::cout << ", ";
     }
   }
   std::cout << ") = " << value << std::endl;
 }
+
 int main()
 {
   PointND pt1;
