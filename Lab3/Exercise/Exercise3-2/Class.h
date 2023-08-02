@@ -21,6 +21,7 @@ class Class
   public:
     Class();
     Class(const Class &);
+    ~Class();
     void initialize();
     void students_info();
     void score_info();

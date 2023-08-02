@@ -14,9 +14,19 @@ Class::Class()
 
 Class::Class(const Class &old_class)
 {
-  students = old_class.students;
   class_size = old_class.class_size;
   passing_score = old_class.passing_score;
+  students = new Student [class_size];
+  for (int i = 0; i < class_size; i++)
+  {
+    students[i] = old_class.students[i];
+  }
+}
+
+Class::~Class()
+{
+  delete [] students;
+  students = NULL;
 }
 
 void Class::initialize()
