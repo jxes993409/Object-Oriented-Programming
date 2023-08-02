@@ -3,8 +3,6 @@
 #include <algorithm>
 #include "LineGp.h"
 
-using namespace std;
-
 LineGp::LineGp()
 {
 
