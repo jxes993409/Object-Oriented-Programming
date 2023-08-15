@@ -215,8 +215,5 @@ node* BST::createNode(void* dataPtr)
 
 void BST::BST_Free()
 {
-  while (root != nullptr)
-  {
-    BST_Delete(root->dataPtr);
-  }
+  while (root != nullptr) {BST_Delete(root->dataPtr);}
 }
