@@ -20,11 +20,11 @@ class BST
     bool BST_Insert(void* dataPtr);
     bool BST_Delete(void* dltKey);
     void BST_Traverse(void (*process) (void* dataPtr));
-    bool BST_Empty();
     bool BST_Full();
     int BST_Count();
-    node* _insert(node* Node, node* newPtr); //Call by BST_Insert
   private:
+    bool BST_Empty();
+    node* _insert(node* Node, node* newPtr); //Call by BST_Insert
     void BST_Inorder(void (*process) (void* dataPtr), node* n);
     node* BST_Parent(node* parNode, node* childNode);
     node* BST_Successor(node* Node);

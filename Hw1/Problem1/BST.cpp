@@ -34,79 +34,67 @@ bool BST::BST_Delete(void *dltKey)
   }
   else
   {
-    // case 1 (0 children)
-    if (dltNode->left == nullptr && dltNode->right == nullptr)
+    // y = dltNode or Successor(dltNode)
+    node* y;
+    if (dltNode->left == nullptr || dltNode->right == nullptr) {y = dltNode;}
+    else {y = BST_Successor(dltNode);}
+
+    // x = non NIL child of y or NIL
+    node* x;
+    if (y->left != nullptr) {x = y->left;}
+    else if (y->right != nullptr) {x = y->right;}
+    else {x = nullptr;}
+
+    // splice out y and modify pointers in parent(y)
+    node* par_y = BST_Parent(root, y);
+    int y_pos;
+    // y = 0 (left child)
+    // y = 1 (right child)
+    // y = -1 (parent(y) = NIL)
+    if (par_y != nullptr) {y_pos = (par_y->left == y) ? 0 : 1;}
+    else {y_pos = -1;}
+
+    if (x != nullptr)
     {
-      node* parNode = BST_Parent(root, dltNode);
-      // left child
-      if (compare(parNode->dataPtr, dltNode->dataPtr) == 0) {parNode->left = nullptr;}
-      // right child
-      else if (compare(parNode->dataPtr, dltNode->dataPtr) == 1) {parNode->right = nullptr;}
+      // parent(y)->leaf is defined by y_pos
+      if (y_pos == 0) {par_y->left = x;}
+      else if (y_pos == 1) {par_y->right = x;}
+    }
+
+    bool dltRoot = false;
+    if (par_y == nullptr)
+    {
+      root = (x == nullptr) ? root : x;
+      dltRoot = (x == nullptr) ? true : false;
+    }
+    else if (x == nullptr)
+    {
+      if (y_pos == 0) {par_y->left = x;}
+      else if (y_pos == 1) {par_y->right = x;}
+    }
+
+    // if y = successor(dltNode), move y->dataPtr to dltNode->dataPtr
+    // then delete y
+    if (y != dltNode)
+    {
+      delete reinterpret_cast<int*>(dltNode->dataPtr);
+      dltNode->dataPtr = y->dataPtr;
+      y->left = nullptr;
+      y->right = nullptr;
+      delete y;
+      y = nullptr;
+    }
+    // delete dltNode
+    else
+    {
       delete reinterpret_cast<int*>(dltNode->dataPtr);
       dltNode->dataPtr = nullptr;
       delete dltNode;
       dltNode = nullptr;
+      // fix root do not point to NIL
+      if (dltRoot) {root = nullptr;}
     }
-    // case 2 (1 child)
-    else if (dltNode->left == nullptr || dltNode->right == nullptr)
-    {
-      node* parNode = BST_Parent(root, dltNode);
-      // left child
-      if (compare(parNode->dataPtr, dltNode->dataPtr) == 0)
-      {
-        // dlt Node have left child
-        if (dltNode->left != nullptr) {parNode->left = dltNode->left;}
-        // dlt Node have right child
-        else if (dltNode->right != nullptr) {parNode->left = dltNode->right;}
-      }
-      // right child
-      else if (compare(parNode->dataPtr, dltNode->dataPtr) == 1)
-      {
-        // dlt Node have left child
-        if (dltNode->left != nullptr) {parNode->right = dltNode->left;}
-        // dlt Node have right child
-        else if (dltNode->right != nullptr) {parNode->right = dltNode->right;}
-      }
-      // root
-      else if (compare(parNode->dataPtr, dltNode->dataPtr) == 2)
-      {
-        // root Node have left child
-        if (dltNode->left != nullptr) {root = dltNode->left;}
-        // root Node have right child
-        else if (dltNode->right != nullptr) {root = dltNode->right;}
-      }
-      if (dltNode->left != nullptr) {dltNode->left = nullptr;}
-      else if (dltNode->right != nullptr) {dltNode->right = nullptr;}
-      delete reinterpret_cast<int*>(dltNode->dataPtr);
-      dltNode->dataPtr = nullptr;
-      delete dltNode;
-      dltNode = nullptr;
-    }
-    // case 3 (2 children)
-    else if (dltNode->left != nullptr && dltNode->right != nullptr)
-    {
-      node* sucNode = BST_Successor(dltNode);
-      delete reinterpret_cast<int*>(dltNode->dataPtr);
-      if (count == 3) // delete the root, only have root and two leaves
-      {
-        root = sucNode;
-        root->left = dltNode->left;
-        dltNode->left = nullptr;
-        dltNode->dataPtr = nullptr;
-        delete dltNode;
-        dltNode = nullptr;
-      }
-      else
-      {
-        node* parNode = BST_Parent(root, sucNode);
-        dltNode->dataPtr = sucNode->dataPtr;
-        parNode->left = (sucNode->right != nullptr) ? sucNode->right : nullptr;
-        sucNode->left = nullptr;
-        sucNode->right = nullptr;
-        delete sucNode;
-        sucNode = nullptr;
-      }
-    }
+
     count--;
     return true;
   }
@@ -114,17 +102,15 @@ bool BST::BST_Delete(void *dltKey)
 
 void BST::BST_Traverse(void (*process) (void *dataPtr))
 {
-  if (BST_Empty()) {cout << "The BST is empty." << endl;}
+  if (BST_Empty())
+  {
+    cout << "The BST is empty." << endl;
+  }
   else
   {
     BST_Inorder(process, root);
     cout << endl;
   }
-}
-
-bool BST::BST_Empty()
-{
-  return (count) ? false : true;
 }
 
 bool BST::BST_Full()
@@ -141,13 +127,19 @@ int BST::BST_Count()
   return count;
 }
 
+bool BST::BST_Empty()
+{
+  return (count) ? false : true;
+}
+
 node* BST::_insert(node* Node, node* newPtr)
 {
+  int cmpValue = (Node == nullptr) ? -1 : compare(Node->dataPtr, newPtr->dataPtr);
   if (Node == nullptr) {Node = newPtr;}
   // Node > new num
-  else if (compare(Node->dataPtr, newPtr->dataPtr) == 0) {Node->left = _insert(Node->left, newPtr);}
+  else if (cmpValue == 0) {Node->left = _insert(Node->left, newPtr);}
   // Node < new num
-  else if (compare(Node->dataPtr, newPtr->dataPtr) == 1) {Node->right = _insert(Node->right, newPtr);}
+  else {Node->right = _insert(Node->right, newPtr);}
 
   return Node;
 }
@@ -162,20 +154,22 @@ void BST::BST_Inorder(void (*process) (void* dataPtr), node* n)
 
 node* BST::BST_Parent(node* parNode, node* childNode)
 {
-  // Node > dlt Node
-  if (compare(parNode->dataPtr, childNode->dataPtr) == 0)
+  int cmpValue = compare(parNode->dataPtr, childNode->dataPtr);
+  switch (cmpValue)
   {
-    if (compare(parNode->left->dataPtr, childNode->dataPtr) == 2) {return parNode;}
-    else {return BST_Parent(parNode->left, childNode);}
+  case 0:
+    // Node > dlt Node
+    return (parNode->left->dataPtr == childNode->dataPtr) ? parNode : BST_Parent(parNode->left, childNode);
+    break;
+  case 1:
+    // Node < dlt Node
+    return (parNode->right->dataPtr == childNode->dataPtr) ? parNode : BST_Parent(parNode->right, childNode);
+    break;
+  default:
+    // no parent, root
+    return nullptr;
+    break;
   }
-  // Node < dlt Node
-  else if (compare(parNode->dataPtr, childNode->dataPtr) == 1)
-  {
-    if (compare(parNode->right->dataPtr, childNode->dataPtr) == 2) {return parNode;}
-    else {return BST_Parent(parNode->right, childNode);}
-  }
-  // no parent, root
-  else {return parNode;}
 }
 
 node* BST::BST_Successor(node* Node)
@@ -203,10 +197,11 @@ node* BST::BST_Mini(node* Node)
 
 node* BST::BST_Key(node* Node, void* dltKey)
 {
-  if (Node == nullptr) {return nullptr;}
-  else if (compare(Node->dataPtr, dltKey) == 0) {return BST_Key(Node->left, dltKey);}
-  else if (compare(Node->dataPtr, dltKey) == 1) {return BST_Key(Node->right, dltKey);}
-  else {return Node;}
+  int cmpValue = (Node == nullptr) ? -5 : compare(Node->dataPtr, dltKey);
+  if (Node == nullptr) {return nullptr;} // Node = nullptr
+  else if (cmpValue == 0) {return BST_Key(Node->left, dltKey);} // Node > dltKey
+  else if (cmpValue == 1) {return BST_Key(Node->right, dltKey);} // Node < dltKey
+  else {return Node;} // Node = dltKey
 }
 
 node* BST::createNode(void* dataPtr)
@@ -222,58 +217,6 @@ void BST::BST_Free()
 {
   while (root != nullptr)
   {
-    if (root->left == nullptr && root->right == nullptr)
-    {
-      delete reinterpret_cast<int*>(root->dataPtr);
-      delete root;
-      root = nullptr;
-    }
-    // case 2 (1 child)
-    else if (root->left == nullptr || root->right == nullptr)
-    {
-      node* dltNode = root;
-      // root Node have left child
-      if (root->left != nullptr)
-      {
-        root = dltNode->left;
-        dltNode->left = nullptr;
-      }
-      // root Node have right child
-      else if (root->right != nullptr)
-      {
-        root = dltNode->right;
-        root->right = nullptr;
-      }
-      delete reinterpret_cast<int*>(dltNode->dataPtr);
-      dltNode->dataPtr = nullptr;
-      delete dltNode;
-      dltNode = nullptr;
-    }
-    // case 3 (2 children)
-    else if (root->left != nullptr && root->right != nullptr)
-    {
-      node* dltNode = root;
-      node* sucNode = BST_Successor(dltNode);
-      delete reinterpret_cast<int*>(dltNode->dataPtr);
-      if (count == 3) // delete the root, only have root and two leaves
-      {
-        root = sucNode;
-        root->left = dltNode->left;
-        dltNode->left = nullptr;
-        dltNode->dataPtr = nullptr;
-        delete dltNode;
-        dltNode = nullptr;
-      }
-      else
-      {
-        node* parNode = BST_Parent(root, sucNode);
-        dltNode->dataPtr = sucNode->dataPtr;
-        parNode->left = (sucNode->right != nullptr) ? sucNode->right : nullptr;
-        sucNode->left = nullptr;
-        sucNode->right = nullptr;
-        delete sucNode;
-        sucNode = nullptr;
-      }
-    }
+    BST_Delete(root->dataPtr);
   }
 }

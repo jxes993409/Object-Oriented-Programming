@@ -30,9 +30,13 @@ int main()
       find = bst.BST_Delete(reinterpret_cast<void*>(del_num));
       if (find)
       {
-        if (bst.BST_Count()) {cout << "New BST: ";}
+        if (bst.BST_Count())
+        {
+          cout << "New BST: ";
+        }
         bst.BST_Traverse(printBST);
       }
+      delete del_num;
     }
     else if (option == 3)
     {
@@ -61,9 +65,10 @@ int main()
 
 int compareInt(void* num1, void* num2)
 {
-  if (*reinterpret_cast<int*>(num1) > *reinterpret_cast<int*>(num2)) {return 0;} // root > new num
-  else if (*reinterpret_cast<int*>(num1) < *reinterpret_cast<int*>(num2)) {return 1;} // root < new num
-  else {return 2;} // root = new num
+  // num1 > num2 return 0
+  if (*reinterpret_cast<int*>(num1) > *reinterpret_cast<int*>(num2)) return 0;
+  // num1 < num2 return 1
+  else if (*reinterpret_cast<int*>(num1) < *reinterpret_cast<int*>(num2)) return 1;
 }
 
 void printBST(void* num)
