@@ -9,9 +9,6 @@ all: $(BIN)
 Matrix.o: Matrix.cpp
 	$(CC) $(CFLAGS) -c $^ -o $@
 
-Matrix_.o: Matrix_.cpp
-	$(CC) $(CFLAGS) -c $^ -o $@
-
 %: %.cpp Matrix.o
 	$(CC) $(CFLAGS) $^ -o $@
 
