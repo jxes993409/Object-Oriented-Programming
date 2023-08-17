@@ -61,11 +61,9 @@ bool BST::BST_Delete(void *dltKey)
       else if (y_pos == 1) {par_y->right = x;}
     }
 
-    bool dltRoot = false;
     if (par_y == nullptr)
     {
-      root = (x == nullptr) ? root : x;
-      dltRoot = (x == nullptr) ? true : false;
+      root = x;
     }
     else if (x == nullptr)
     {
@@ -91,8 +89,6 @@ bool BST::BST_Delete(void *dltKey)
       dltNode->dataPtr = nullptr;
       delete dltNode;
       dltNode = nullptr;
-      // fix root do not point to NIL
-      if (dltRoot) {root = nullptr;}
     }
 
     count--;
@@ -197,7 +193,7 @@ node* BST::BST_Mini(node* Node)
 
 node* BST::BST_Key(node* Node, void* dltKey)
 {
-  int cmpValue = (Node == nullptr) ? -5 : compare(Node->dataPtr, dltKey);
+  int cmpValue = (Node == nullptr) ? -1 : compare(Node->dataPtr, dltKey);
   if (Node == nullptr) {return nullptr;} // Node = nullptr
   else if (cmpValue == 0) {return BST_Key(Node->left, dltKey);} // Node > dltKey
   else if (cmpValue == 1) {return BST_Key(Node->right, dltKey);} // Node < dltKey
