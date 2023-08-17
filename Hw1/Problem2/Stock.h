@@ -30,4 +30,4 @@ class Stock
     static void refresh_current_price();
 };
 
-# endif
+#endif
