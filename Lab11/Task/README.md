@@ -9,7 +9,6 @@
 # Task 11-5
 * sort() function sorts the elements according to a compared function defined by user
 # Task 11-6
-* map (STL)  
-sort the pairs of items by the `keys`
+* map (STL), sort the pairs of items by the `keys`
 # Task 11-7
 * Operations for map (iterator, erase(), find(), ...)
